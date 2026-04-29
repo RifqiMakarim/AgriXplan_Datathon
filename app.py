@@ -19,14 +19,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from azure.ai.ml import MLClient
-from azure.identity import DefaultAzureCredential
+from azure.identity import InteractiveBrowserCredential, DefaultAzureCredential
 
 @st.cache_resource
 def get_azure_credential():
-    """Mengambil kredensial Azure secara otomatis untuk Server/Produksi."""
-    # DefaultAzureCredential akan mendeteksi kredensial dari Environment Variables, 
-    # Managed Identity (di Azure), atau otentikasi Azure CLI secara otomatis.
-    return DefaultAzureCredential()
+    """Mengambil kredensial Azure (Browser untuk Lokal, Default untuk Cloud)."""
+    # Jika AZURE_CLIENT_ID ada (di Streamlit Secrets), gunakan DefaultAzureCredential
+    if os.getenv("AZURE_CLIENT_ID"):
+        return DefaultAzureCredential()
+    # Jika lokal dan tidak ada Client ID, gunakan browser
+    return InteractiveBrowserCredential()
 
 def connect_azure(): 
     try:
