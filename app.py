@@ -41,13 +41,13 @@ def connect_azure():
         
         # Tes panggil workspace
         ws = ml_client.workspaces.get(name=os.getenv("AZURE_WORKSPACE_NAME"))
-        return f"✅ Berhasil Terhubung ke Azure ML: {ws.name}"
+        return f"Berhasil Terhubung ke Azure ML: {ws.name}"
     except Exception as e:
-        return f"⚠️ Mode Lokal (Gagal Connect Azure): {e}"
+        return f"Mode Lokal (Gagal Connect Azure): {e}"
 
 st.set_page_config(
     page_title="AgriXplan - Sistem Pemetaan Produktivitas Padi Indonesia",
-    page_icon="🌾",
+    page_icon=None,
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -401,13 +401,13 @@ def build_folium_map(gdf: gpd.GeoDataFrame, selected_prov: str) -> folium.Map:
         <div style="font-family:Inter,sans-serif;min-width:200px;color:#1e293b;">
           <h4 style="margin:0 0 6px;color:#0369a1;">{row['Provinsi']}</h4>
           <table style="font-size:12px;width:100%;border-collapse:collapse;">
-            <tr><td>🌾 Produktivitas</td><td><b>{row['Y_Produktivitas']:.2f} ku/ha</b></td></tr>
-            <tr><td>🐛 OPT</td><td>{row['X1_OPT']:,.0f} ha</td></tr>
-            <tr><td>🧪 Pupuk NPK</td><td>{row['X2_Pupuk_NPK']:,.0f} ton</td></tr>
-            <tr><td>🌡️ Suhu</td><td>{row['X3_Suhu']:.2f} °C</td></tr>
-            <tr><td>🌧️ Curah Hujan</td><td>{row['X4_CurahHujan']:.1f} mm</td></tr>
-            <tr><td>🚜 Alsintan</td><td>{row['X5_Alsintan']:,.0f} unit</td></tr>
-            <tr><td>⭐ Faktor Utama</td><td><b>{row['Faktor_Paling_Signifikan']}</b></td></tr>
+            <tr><td>Produktivitas</td><td><b>{row['Y_Produktivitas']:.2f} ku/ha</b></td></tr>
+            <tr><td>OPT</td><td>{row['X1_OPT']:,.0f} ha</td></tr>
+            <tr><td>Pupuk NPK</td><td>{row['X2_Pupuk_NPK']:,.0f} ton</td></tr>
+            <tr><td>Suhu</td><td>{row['X3_Suhu']:.2f} °C</td></tr>
+            <tr><td>Curah Hujan</td><td>{row['X4_CurahHujan']:.1f} mm</td></tr>
+            <tr><td>Alsintan</td><td>{row['X5_Alsintan']:,.0f} unit</td></tr>
+            <tr><td>Faktor Utama</td><td><b>{row['Faktor_Paling_Signifikan']}</b></td></tr>
           </table>
         </div>
         """
@@ -645,28 +645,28 @@ def build_variable_chart(gdf: gpd.GeoDataFrame, col_name: str, title_label: str)
 # ─────────────────────────────────────────────────────────────────────────────
 def main():
     # ── Load & proses data ──────────────────────────────────────────────────
-    with st.spinner("📂 Membaca & membersihkan data AgriData.csv..."):
+    with st.spinner("Membaca & membersihkan data AgriData.csv..."):
         gdf_clean = load_and_preprocess("AgriData.csv")
 
-    with st.spinner("⚙️ Menjalankan model GWR (grid-search bandwidth)..."):
+    with st.spinner("Menjalankan model GWR (grid-search bandwidth)..."):
         gdf = run_gwr(gdf_clean)
 
     feat_lbls = gdf.attrs["feat_lbls"]
 
     # ── SIDEBAR ─────────────────────────────────────────────────────────────
     with st.sidebar:
-        st.markdown("## 🌾 AgriXplan")
+        st.markdown("## AgriXplan")
         
         # Tes koneksi Azure ML
         st.success(connect_azure())
         st.markdown("---")
 
-        st.markdown("### 📍 Pilih Provinsi")
+        st.markdown("### Pilih Provinsi")
         prov_list = sorted(gdf["Provinsi"].tolist())
         selected_prov = st.selectbox("Provinsi", options=prov_list, index=0)
 
         st.markdown("---")
-        st.markdown("### 📊 Statistik Model GWR")
+        st.markdown("### Statistik Model GWR")
         st.metric("R² Global",      f"{gdf.attrs['r2']:.4f}")
         st.metric("Adj. R²",        f"{gdf.attrs['adj_r2']:.4f}")
         st.metric("AICc",           f"{gdf.attrs['aicc']:.2f}")
@@ -689,7 +689,7 @@ def main():
     # ── HEADER ──────────────────────────────────────────────────────────────
     st.markdown(
         "<h1 style='color:#38bdf8;margin-bottom:0;'>"
-        "🌾 AgriXplan </h1>",
+        "AgriXplan </h1>",
         unsafe_allow_html=True,
     )
     st.markdown(
@@ -718,7 +718,7 @@ def main():
 
         with map_col:
             st.markdown(
-                "<div class='section-header'>🗺️ Peta Interaktif Produktivitas Padi</div>",
+                "<div class='section-header'>Peta Interaktif Produktivitas Padi</div>",
                 unsafe_allow_html=True,
             )
             m = build_folium_map(gdf, selected_prov)
@@ -726,7 +726,7 @@ def main():
 
         with chart_col:
             st.markdown(
-                "<div class='section-header'>📊 Koefisien GWR Lokal per Variabel</div>",
+                "<div class='section-header'>Koefisien GWR Lokal per Variabel</div>",
                 unsafe_allow_html=True,
             )
             sel_row = gdf[gdf["Provinsi"] == selected_prov].iloc[0]
@@ -734,7 +734,7 @@ def main():
             st.plotly_chart(fig_bar, use_container_width=True,
                             config={"displayModeBar": False})
 
-            st.metric("🌾 Produktivitas", f"{sel_row['Y_Produktivitas']:.2f} ku/ha")
+            st.metric("Produktivitas", f"{sel_row['Y_Produktivitas']:.2f} ku/ha")
 
         st.markdown("---")
 
@@ -762,7 +762,7 @@ def main():
 
         # ── VISUALISASI TIAP VARIABEL ──────────────────────────────────────────
         st.markdown(
-            "<div class='section-header'>📈 Analisis Distribusi Tiap Variabel</div>",
+            "<div class='section-header'>Analisis Distribusi Tiap Variabel</div>",
             unsafe_allow_html=True,
         )
         
@@ -800,7 +800,7 @@ def main():
             "Kategori Faktor Dominan"
         ]
         
-        st.markdown("#### 🔎 Filter & Pengurutan Data")
+        st.markdown("#### Filter & Pengurutan Data")
         col_f1, col_f2 = st.columns(2)
             
         with col_f1:
@@ -866,7 +866,7 @@ def main():
         # Download CSV
         csv = display_df.to_csv(index=False).encode("utf-8")
         st.download_button(
-            label="⬇️ Unduh Dataset sebagai CSV",
+            label="Unduh Dataset sebagai CSV",
             data=csv,
             file_name="gwr_padi_indonesia.csv",
             mime="text/csv",
@@ -874,7 +874,7 @@ def main():
 
     with tab_insight:
         st.markdown(
-            "<div class='section-header'>💡 Insight</div>",
+            "<div class='section-header'>Insight</div>",
             unsafe_allow_html=True,
         )
         st.info("Coming soon...")
